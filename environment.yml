@@ -1,4 +1,4 @@
-name: hovernet
+name: hovernet_11
 channels:
   - conda-forge
   - defaults

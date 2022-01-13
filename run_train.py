@@ -29,7 +29,7 @@ import matplotlib
 import numpy as np
 import torch
 from docopt import docopt
-from tensorboardX import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 from torch.nn import DataParallel  # TODO: switch to DistributedDataParallel
 from torch.utils.data import DataLoader
 
@@ -66,8 +66,8 @@ def worker_init_fn(worker_id):
 class TrainManager(Config):
     """Either used to view the dataset or to initialise the main training loop."""
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, organ = 'Breast'):
+        super().__init__(organ)
         return
 
     ####

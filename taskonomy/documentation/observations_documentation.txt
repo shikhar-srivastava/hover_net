@@ -1,0 +1,114 @@
+#### Data Formatting troubles
+
+Expected in Hover-Net:
+    1. Instance Mask
+    [0, N] values for each pixel, where N is the number of nuclei instances in the image.
+
+    2. Type Mask
+    [0,C] for 0 being background and C being the number of classes.
+        
+            a) Expects Background = 0 value
+
+
+But, Present in PanNuke:
+==============================================================
+"Documentation for the data format":
+The files within each fold directories are:
+
+* `images.npy` - image patches of 256x256
+
+* `masks.npy` an array of 6 channel instance-wise masks (0: Neoplastic cells, 1: Inflammatory, 2: Connective/Soft tissue cells, 3: Dead Cells, 4: Epithelial, 6: Background)
+(0: Neoplastic cells, 1: Inflammatory, 2: Connective/Soft tissue cells, 3: Dead Cells, 4: Epithelial, 6: Background)
+
+0 Neoplastic cells: 
+
+0.0       472948872
+1.0          180117
+2.0          159209
+6.0          158278
+86.0         157542
+            ...    
+1850.0           14
+2109.0           12
+3515.0            8
+2110.0            4
+3514.0            3
+Length: 2558, dtype: int64
+
+
+1: Inflammatory:
+
+0.0       508611437
+12.0          28376
+6.0           28210
+8.0           28121
+11.0          28039
+            ...    
+1457.0            6
+2282.0            6
+2293.0            4
+2017.0            3
+2082.0            2
+Length: 2046, dtype: int64
+
+2: Connective/Soft tissue cells
+
+0.0       498450019
+1.0          108851
+2.0          107249
+3.0           96515
+8.0           94259
+            ...    
+2286.0           22
+3506.0           20
+2290.0           10
+2291.0            6
+1485.0            2
+Length: 1931, dtype: int64
+
+3: Dead Cells
+
+0.0       517441913
+1.0            2709
+18.0           1843
+136.0          1728
+3.0            1538
+            ...    
+429.0             9
+907.0             7
+1366.0            6
+763.0             2
+3517.0            2
+Length: 1934, dtype: int64
+
+4: Epithelial
+
+0.0       504976797
+30.0          40512
+120.0         38871
+144.0         37556
+191.0         37155
+            ...    
+1345.0          111
+914.0           111
+1549.0          109
+1127.0          106
+1173.0           30
+Length: 1138, dtype: int64
+
+5: Background
+
+1.0    420747521
+0.0     97052415
+dtype: int64
+
+* `types.py`  tissue type that a given path was extracted from.
+
+=== OBSERVATIONS ==
+    1. MASK [DATA_SIZE, 256, 256, 6] : Mask where there are 6 channels for 5 different nuclei and background.
+            
+            a) BACKGROUND is Channel 5!
+            
+    2. IMG [DATA_SIZE, 256,256,3]: Doesn't mention if RGB/BRG?
+
+    3. TYPE [DATA_SIZE,]: Which Location each 256,256,3 IMG was taken from.

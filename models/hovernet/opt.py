@@ -17,7 +17,10 @@ from .targets import gen_targets, prep_sample
 from .net_desc import create_model
 from .run_desc import proc_valid_step_output, train_step, valid_step, viz_step_output
 
-
+NR_EPOCHS = 50
+LR = 1.0e-4
+NR_PROCS = int(16)
+BATCH_SIZE = int(32)
 # TODO: training config only ?
 # TODO: switch all to function name String for all option
 def get_config(nr_type, mode):
@@ -37,12 +40,12 @@ def get_config(nr_type, mode):
                         "optimizer": [
                             optim.Adam,
                             {  # should match keyword for parameters within the optimizer
-                                "lr": 1.0e-4,  # initial learning rate,
+                                "lr": LR,  # initial learning rate,
                                 "betas": (0.9, 0.999),
                             },
                         ],
                         # learning rate scheduler
-                        "lr_scheduler": lambda x: optim.lr_scheduler.StepLR(x, 25),
+                        "lr_scheduler": lambda x: optim.lr_scheduler.StepLR(x, int(NR_EPOCHS/2)),
                         "extra_info": {
                             "loss": {
                                 "np": {"bce": 1, "dice": 1},
@@ -52,13 +55,13 @@ def get_config(nr_type, mode):
                         },
                         # path to load, -1 to auto load checkpoint from previous phase,
                         # None to start from scratch
-                        "pretrained": "../pretrained/ImageNet-ResNet50-Preact_pytorch.tar",
+                        "pretrained": "/l/users/shikhar.srivastava/workspace/hover_net/ImageNet-ResNet50-Preact_pytorch.tar",
                         # 'pretrained': None,
                     },
                 },
                 "target_info": {"gen": (gen_targets, {}), "viz": (prep_sample, {})},
-                "batch_size": {"train": 16, "valid": 16,},  # engine name : value
-                "nr_epochs": 50,
+                "batch_size": {"train": BATCH_SIZE, "valid": BATCH_SIZE,},  # engine name : value
+                "nr_epochs": NR_EPOCHS,
             },
             {
                 "run_info": {
@@ -71,12 +74,12 @@ def get_config(nr_type, mode):
                         "optimizer": [
                             optim.Adam,
                             {  # should match keyword for parameters within the optimizer
-                                "lr": 1.0e-4,  # initial learning rate,
+                                "lr": LR,  # initial learning rate,
                                 "betas": (0.9, 0.999),
                             },
                         ],
                         # learning rate scheduler
-                        "lr_scheduler": lambda x: optim.lr_scheduler.StepLR(x, 25),
+                        "lr_scheduler": lambda x: optim.lr_scheduler.StepLR(x,  int(NR_EPOCHS/2)),
                         "extra_info": {
                             "loss": {
                                 "np": {"bce": 1, "dice": 1},
@@ -90,8 +93,8 @@ def get_config(nr_type, mode):
                     },
                 },
                 "target_info": {"gen": (gen_targets, {}), "viz": (prep_sample, {})},
-                "batch_size": {"train": 4, "valid": 8,}, # batch size per gpu
-                "nr_epochs": 50,
+                "batch_size": {"train": int(BATCH_SIZE/4), "valid": int(BATCH_SIZE/2),}, # batch size per gpu
+                "nr_epochs": NR_EPOCHS,
             },
         ],
         # ------------------------------------------------------------------
@@ -102,7 +105,7 @@ def get_config(nr_type, mode):
             "train": {
                 # TODO: align here, file path or what? what about CV?
                 "dataset": "",  # whats about compound dataset ?
-                "nr_procs": 16,  # number of threads for dataloader
+                "nr_procs": int(NR_PROCS),  # number of threads for dataloader
                 "run_step": train_step,  # TODO: function name or function variable ?
                 "reset_per_run": False,
                 # callbacks are run according to the list order of the event
@@ -123,7 +126,7 @@ def get_config(nr_type, mode):
             },
             "valid": {
                 "dataset": "",  # whats about compound dataset ?
-                "nr_procs": 8,  # number of threads for dataloader
+                "nr_procs": int(NR_PROCS/2),  # number of threads for dataloader
                 "run_step": valid_step,
                 "reset_per_run": True,  # * to stop aggregating output etc. from last run
                 # callbacks are run according to the list order of the event
