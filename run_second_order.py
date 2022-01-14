@@ -9,7 +9,7 @@ import pandas as pd
 
     *NOTE:
         Incase of Slurm SBATCH overflow, use kill command below:
-        > squeue -u ss2 | awk '{print $1}' | xargs -n 1 scancel
+        > squeue -u shikhar.srivastava | awk '{print $1}' | xargs -n 1 scancel
         # squeue -n ewc_sensitivity | awk '{print $1}' | xargs -n 1 scancel
 '''
 
@@ -69,15 +69,29 @@ if __name__ == '__main__':
     bucket_step_string = 'top9'
 
     input_dir = '/l/users/shikhar.srivastava/data/pannuke/'
+    log_path = '/l/users/shikhar.srivastava/workspace/hover_net/logs/second_order/'
     DIR = input_dir + bucket_step_string + '/'
-    command = "ulimit -u 10000\n/home/shikhar.srivastava/miniconda3/envs/hovernet_11/bin/python /l/users/shikhar.srivastava/workspace/hover_net/run_train.py"
+
+    command = "ulimit -u 10000\n/home/shikhar.srivastava/miniconda3/envs/hovernet_11/bin/python /l/users/shikhar.srivastava/workspace/hover_net/run_transfer.py"
     params = dict()
-    params['gpu'] = '0,1,2,3'
+    params['gpu'] = '0,1'
+    gres = 'gpu:2'
     params['bucket_step_string'] = bucket_step_string
-    output = f'/l/users/shikhar.srivastava/workspace/hover_net/logs/{bucket_step_string}/slurm/%j.out'
 
     selected_types = pd.read_csv(DIR + 'selected_types.csv')['0']
 
-    for type in selected_types:
-        params['organ'] = type
-        dispatch_job(command, params, output=output, run_name = type+'_'+bucket_step_string)
+    if not os.path.exists(log_path + bucket_step_string):
+        os.makedirs(log_path + bucket_step_string + '/')
+        os.makedirs(log_path + bucket_step_string + '/ckpts/')
+        os.makedirs(log_path + bucket_step_string + '/slurm/')
+
+    for target_type in selected_types:
+        params['target_organ'] = target_type
+        for source_type in selected_types:
+            params['source_organ'] = source_type
+            output = f'{log_path}{bucket_step_string}/slurm/{source_type}-{target_type}-%j.out'
+            
+            if not os.path.exists(log_path + bucket_step_string + '/ckpts/' + source_type + '-' + target_type + '/'):
+                os.makedirs(log_path + bucket_step_string + '/ckpts/' + source_type + '-' + target_type + '/')
+            
+            dispatch_job(command, params, gres = gres, output=output, run_name = source_type+'-'+target_type+'-'+bucket_step_string)

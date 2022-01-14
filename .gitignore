@@ -12,3 +12,5 @@ exp_output/
 *.log
 logs/*
 *.tar
+taskonomy/notebooks/first_order-top5.xlsx
+*.xlsx
