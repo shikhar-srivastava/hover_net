@@ -3,7 +3,7 @@
 Main HoVer-Net training script.
 
 Usage:
-  run_train.py [--gpu=<id>] [--view=<dset>]
+  run_train.py [--gpu=<id>] [--view=<dset>] [--organ=<string>] [--bucket_step_string=<string>]
   run_train.py (-h | --help)
   run_train.py --version
 
@@ -12,6 +12,8 @@ Options:
   --version       Show version.
   --gpu=<id>      Comma separated GPU list. [default: 0,1,2,3]
   --view=<dset>   Visualise images after augmentation. Choose 'train' or 'valid'.
+  --organ=<string> Organ to train on. Choose 'lung' or 'heart' or one of the other buckets.
+  --bucket_step_string=<string> Bucket step string.
 """
 
 import cv2
@@ -66,8 +68,8 @@ def worker_init_fn(worker_id):
 class TrainManager(Config):
     """Either used to view the dataset or to initialise the main training loop."""
 
-    def __init__(self, organ = 'Breast'):
-        super().__init__(organ)
+    def __init__(self, organ = 'Breast', bucket_step = 'top9'):
+        super().__init__(organ, bucket_step)
         return
 
     ####
@@ -294,12 +296,8 @@ class TrainManager(Config):
 ####
 if __name__ == "__main__":
     args = docopt(__doc__, version="HoVer-Net v1.0")
-    trainer = TrainManager()
+    print('args received: %s' % args)
+    os.environ["CUDA_VISIBLE_DEVICES"] = args["--gpu"]
 
-    if args["--view"]:
-        if args["--view"] != "train" and args["--view"] != "valid":
-            raise Exception('Use "train" or "valid" for --view.')
-        trainer.view_dataset(args["--view"])
-    else:
-        os.environ["CUDA_VISIBLE_DEVICES"] = args["--gpu"]
-        trainer.run()
+    trainer = TrainManager(organ = args['--organ'], bucket_step = args['--bucket_step_string'])
+    trainer.run()

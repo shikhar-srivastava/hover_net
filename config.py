@@ -10,12 +10,12 @@ from dataset import get_dataset
 class Config(object):
     """Configuration file."""
 
-    def __init__(self, organ):
+    def __init__(self, organ, bucket_step):
         self.seed = 10
 
         # Adrenal_gland  Bile-duct  Breast  Cervix  Colon  Esophagus  HeadNeck  Liver  Thyroid
         self.organ = organ 
-
+        self.bucket_step = bucket_step
         self.logging = True
 
         # turn on debug flag to trace some parallel processing problems more easily
@@ -48,14 +48,14 @@ class Config(object):
                 raise Exception("If using `original` mode, input shape must be [256,256] and output shape must be [164,164]")
 
         self.dataset_name = "pannuke" # extracts dataset info from dataset.py
-        self.log_dir = "/l/users/shikhar.srivastava/workspace/hover_net/logs/ckpts/%s/" % self.organ # where checkpoints will be saved
+        self.log_dir = "/l/users/shikhar.srivastava/workspace/hover_net/logs/%s/ckpts/%s/" % (self.bucket_step, self.organ) # where checkpoints will be saved
 
         # paths to training and validation patches
         self.train_dir_list = [
-            "/l/users/shikhar.srivastava/data/pannuke/patch_dataset/%s/train/540x540_164x164/" % self.organ
+            "/l/users/shikhar.srivastava/data/pannuke/processed/%s/%s/train/540x540_164x164/" % (self.bucket_step, self.organ)
         ]
         self.valid_dir_list = [
-            "/l/users/shikhar.srivastava/data/pannuke/patch_dataset/%s/test/540x540_164x164/" % self.organ
+            "/l/users/shikhar.srivastava/data/pannuke/processed/%s/%s/test/540x540_164x164/" % (self.bucket_step, self.organ)
         ]
 
         self.shape_info = {

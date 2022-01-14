@@ -16,6 +16,8 @@ def bucketing(write_dir, input_dir ='/l/users/shikhar.srivastava/data/pannuke/fu
 
     if not os.path.exists(write_dir):
         os.makedirs(write_dir)
+    if not os.path.exists(split_viz_path):
+        os.makedirs(split_viz_path)
 
     img = load_numpy_file(input_dir + 'images.npy')
     types = load_numpy_file(input_dir + 'types.npy')
@@ -34,7 +36,7 @@ def bucketing(write_dir, input_dir ='/l/users/shikhar.srivastava/data/pannuke/fu
     for selected_type in tqdm(selected_types.index, desc = 'Iterating Buckets'):
         type_name = selected_type[0]
         type_indices = np.where(types == type_name)[0]
-        rand_select = list(randint(len(type_indices), thresh))
+        rand_select = list(randint(len(type_indices), bucketing_threshold))
     
         indices_of_given_type = list(np.array(type_indices)[rand_select])
         #print(np.array(indices_of_given_type).shape)
@@ -42,7 +44,6 @@ def bucketing(write_dir, input_dir ='/l/users/shikhar.srivastava/data/pannuke/fu
         indices_taken = 0
         for split_idx, split in enumerate(training_splits):
 
-            #print(f'Bucketing for {split} split')
             if not os.path.exists(write_dir + type_name):
                 os.makedirs(write_dir + type_name)
             if not os.path.exists(write_dir + type_name + '/' + split):
@@ -59,9 +60,10 @@ def bucketing(write_dir, input_dir ='/l/users/shikhar.srivastava/data/pannuke/fu
             write_numpy_file(write_dir + type_name + '/' + split + '/anns.npy', ann[thresh_indices])
 
             # Save Split Viz to viz folder
-            _types = types[thresh_indices]
-            pd.DataFrame(_types[_types !=0].flatten()).value_counts().plot(kind='pie', title = '%s [%s] Class-wise Distribution'%(type_name, split), figsize=(8,8)).savefig(split_viz_path + '%s_%s_pie.png'%(type_name, split))
-
+            _types = type_mask[thresh_indices]
+            _types = _types[_types!=0]
+            pd.DataFrame(_types.flatten()).value_counts().plot(kind='pie', title = '%s [%s] Class-wise Distribution'%(type_name, split), legend = True,figsize=(8,8)).get_figure().savefig(split_viz_path + '%s_%s_pie.png'%(type_name, split))
+            plt.clf()
 
     print('\n')
     print('Bucketing Done')
