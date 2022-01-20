@@ -48,7 +48,7 @@ class Config(object):
                 raise Exception("If using `original` mode, input shape must be [256,256] and output shape must be [164,164]")
 
         self.dataset_name = "pannuke" # extracts dataset info from dataset.py
-        self.log_dir = "/l/users/shikhar.srivastava/workspace/hover_net/logs/%s/ckpts/%s/" % (self.bucket_step, self.organ) # where checkpoints will be saved
+        self.log_dir = "/l/users/shikhar.srivastava/workspace/hover_net/logs/first_order/%s/ckpts/%s/" % (self.bucket_step, self.organ) # where checkpoints will be saved
 
         # paths to training and validation patches
         self.train_dir_list = [

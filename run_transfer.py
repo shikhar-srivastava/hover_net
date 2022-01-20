@@ -302,3 +302,8 @@ if __name__ == "__main__":
 
     trainer = TrainManager(source_organ = args['--source_organ'], target_organ=args['--target_organ'], bucket_step = args['--bucket_step_string'])
     trainer.run()
+    # Delete all .tar checkpoints except the last one
+    os.system("find /l/users/shikhar.srivastava/workspace/hover_net/logs/second_order/%s/ckpts/\
+        %s-%s/ -type f -name '*.tar' ! -name '*=%d.tar' -exec rm -r {} +" % \
+    (args['--bucket_step_string'],args['--source_organ'],args['--target_organ'],trainer.model_config['phase_list'][0]['nr_epochs']))
+ 

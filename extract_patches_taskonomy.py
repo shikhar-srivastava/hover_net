@@ -19,8 +19,8 @@ import numpy as np
 import pandas as pd
 # -------------------------------------------------------------------------------------
 
-INPUT_DIR = '/l/users/shikhar.srivastava/data/pannuke/top5/'
-OUTPUT_DIR = '/l/users/shikhar.srivastava/data/pannuke/processed/top5/'
+INPUT_DIR = '/l/users/shikhar.srivastava/data/pannuke/top19/'
+OUTPUT_DIR = '/l/users/shikhar.srivastava/data/pannuke/processed/top19/'
 
 if __name__ == "__main__":
 

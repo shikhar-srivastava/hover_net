@@ -9,7 +9,7 @@ import pandas as pd
 
     *NOTE:
         Incase of Slurm SBATCH overflow, use kill command below:
-        > squeue -u ss2 | awk '{print $1}' | xargs -n 1 scancel
+        > squeue -u shikhar.srivastava | awk '{print $1}' | xargs -n 1 scancel
         # squeue -n ewc_sensitivity | awk '{print $1}' | xargs -n 1 scancel
 '''
 
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     '''
     # Define your command here
 
-    bucket_step_string = 'top9'
+    bucket_step_string = 'top19'
 
     input_dir = '/l/users/shikhar.srivastava/data/pannuke/'
     DIR = input_dir + bucket_step_string + '/'
@@ -74,10 +74,17 @@ if __name__ == '__main__':
     params = dict()
     params['gpu'] = '0,1,2,3'
     params['bucket_step_string'] = bucket_step_string
-    output = f'/l/users/shikhar.srivastava/workspace/hover_net/logs/{bucket_step_string}/slurm/%j.out'
+    output = f'/l/users/shikhar.srivastava/workspace/hover_net/logs/first_order/{bucket_step_string}/slurm/%j.out'
 
     selected_types = pd.read_csv(DIR + 'selected_types.csv')['0']
 
+    if not os.path.exists(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/first_order/{bucket_step_string}/'):
+        os.makedirs(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/first_order/{bucket_step_string}/')
+        os.makedirs(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/first_order/{bucket_step_string}/ckpts/')
+        os.makedirs(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/first_order/{bucket_step_string}/slurm/')
+
     for type in selected_types:
         params['organ'] = type
+        if not os.path.exists(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/first_order/{bucket_step_string}/ckpts/{type}/'):
+            os.makedirs(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/first_order/{bucket_step_string}/ckpts/{type}/')
         dispatch_job(command, params, output=output, run_name = type+'_'+bucket_step_string)
