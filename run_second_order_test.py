@@ -74,8 +74,8 @@ if __name__ == '__main__':
 
     command = "ulimit -u 10000\n/home/shikhar.srivastava/miniconda3/envs/hovernet_11/bin/python /l/users/shikhar.srivastava/workspace/hover_net/run_test.py"
     params = dict()
-    params['gpu'] = '0,1'
-    gres = 'gpu:2'
+    params['gpu'] = '0,1,2,3'
+    gres = 'gpu:4'
     params['bucket_step_string'] = bucket_step_string
 
     selected_types = pd.read_csv(DIR + 'selected_types.csv')['0']
