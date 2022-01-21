@@ -1,5 +1,6 @@
 import operator
 import json
+import pickle
 
 import cv2
 import matplotlib.pyplot as plt
@@ -215,7 +216,22 @@ class ProcessAccumulatedRawOutput(BaseCallbacks):
         state.tracked_step_output = track_dict
         return
 
+class ProcessAccumulatedRawOutput_per_image(BaseCallbacks):
+    def __init__(self, proc_func,_pickle=True):
+        super().__init__()
+        self.proc_func = proc_func
+        self._pickle = _pickle
+    
+    def run(self, state, event):
+        raw_data = state.epoch_accumulated_output
 
+        per_image_stat = self.proc_func(raw_data)
+        state.per_image_stat = per_image_stat
+        if self._pickle:
+            with open(state.log_info["per_image_stat_file"], "wb") as f:
+                pickle.dump(per_image_stat, f)
+        return
+        
 ####
 class VisualizeOutput(BaseCallbacks):
     def __init__(self, proc_func, per_n_epoch=1):

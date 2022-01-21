@@ -342,3 +342,54 @@ def proc_valid_step_output(raw_data, nr_types=None):
     track_dict["image"]["output"] = viz_fig
 
     return track_dict
+
+
+def proc_valid_step_output_per_image(raw_data, nr_types=None):
+   
+    track_dict = {}
+
+    def _dice_info(true, pred, label):
+        true = np.array(true == label, np.int32)
+        pred = np.array(pred == label, np.int32)
+        inter = (pred * true).sum()
+        total = (pred + true).sum()
+        return inter, total
+
+    prob_np = raw_data["prob_np"]
+    true_np = raw_data["true_np"]
+    pred_tp = raw_data["pred_tp"]
+    true_tp = raw_data["true_tp"]
+    # * HV regression statistic
+    pred_hv = raw_data["pred_hv"]
+    true_hv = raw_data["true_hv"]
+
+    for img_idx in range(len(raw_data['imgs'])):
+        track_dict[img_idx] = {}
+
+        patch_prob_np = prob_np[img_idx]
+        patch_true_np = true_np[img_idx]
+        patch_pred_np = np.array(patch_prob_np > 0.5, dtype=np.int32)
+        inter, total = _dice_info(patch_true_np, patch_pred_np, 1)
+        correct = (patch_pred_np == patch_true_np).sum()
+        nr_pixels = np.size(true_np[0])
+        acc_np = correct / nr_pixels
+        dic_np = 2 * inter / (total+ 1.0e-8)
+        track_dict[img_idx]['np_acc'] = acc_np
+        track_dict[img_idx]['np_dic'] = dic_np
+
+        patch_pred_tp = pred_tp[img_idx]
+        patch_true_tp = true_tp[img_idx]
+
+        for type_id in range(0, nr_types):
+            inter, total = _dice_info(patch_true_tp, patch_pred_tp, type_id)
+            dice_tp = 2 * inter / (total+ 1.0e-8)
+            track_dict[img_idx]['tp_dic_' + str(type_id)] = dice_tp
+
+        patch_pred_hv = pred_hv[img_idx]
+        patch_true_hv = true_hv[img_idx]
+        squared_error = patch_pred_hv - patch_true_hv
+        squared_error = squared_error * squared_error
+        mse = squared_error.sum()/nr_pixels
+        track_dict[img_idx]['hv_mse'] = mse
+
+    return track_dict

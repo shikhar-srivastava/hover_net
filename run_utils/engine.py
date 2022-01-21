@@ -51,6 +51,9 @@ class State(object):
         self.step_output = None
 
         self.global_state = None
+
+        self.per_image_stat = None
+        
         return
 
     def reset_variable(self):

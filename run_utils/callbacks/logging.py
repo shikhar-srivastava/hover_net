@@ -102,7 +102,6 @@ class LoggingEpochOutput(BaseCallbacks):
             current_epoch = str(state.global_state.curr_epoch)
         else:
             current_epoch = str(state.curr_epoch)
-
         output = state.tracked_step_output
 
         def get_serializable_values(output_format):
