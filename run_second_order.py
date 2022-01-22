@@ -66,7 +66,7 @@ if __name__ == '__main__':
     '''
     # Define your command here
 
-    bucket_step_string = 'top9'
+    bucket_step_string = 'top19'
 
     input_dir = '/l/users/shikhar.srivastava/data/pannuke/'
     log_path = '/l/users/shikhar.srivastava/workspace/hover_net/logs/second_order/'

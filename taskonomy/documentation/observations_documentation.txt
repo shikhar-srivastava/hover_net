@@ -112,3 +112,15 @@ dtype: int64
     2. IMG [DATA_SIZE, 256,256,3]: Doesn't mention if RGB/BRG?
 
     3. TYPE [DATA_SIZE,]: Which Location each 256,256,3 IMG was taken from.
+
+
+
+
+
+
+
+3) Experimentation Logs:
+
+        A) Top19 Second order issues:
+                Job 3767 Kindey -> Adrenal Glad: Didn't finish
+                
