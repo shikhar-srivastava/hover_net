@@ -3,6 +3,7 @@ from re import X
 from simple_slurm import Slurm
 import os 
 import pandas as pd
+import time
 '''
     Install Slurm library:
         pip install simple-slurm
@@ -66,7 +67,7 @@ if __name__ == '__main__':
     '''
     # Define your command here
 
-    bucket_step_string = 'top9'
+    bucket_step_string = 'top19'
 
     input_dir = '/l/users/shikhar.srivastava/data/pannuke/'
     log_path = '/l/users/shikhar.srivastava/workspace/hover_net/logs/test/second_order/'
@@ -95,4 +96,11 @@ if __name__ == '__main__':
             if not os.path.exists(log_path + bucket_step_string + '/ckpts/' + source_type + '-' + target_type + '/'):
                 os.makedirs(log_path + bucket_step_string + '/ckpts/' + source_type + '-' + target_type + '/')
             
-            dispatch_job(command, params, gres = gres, output=output, run_name = source_type+'-'+target_type+'-'+bucket_step_string)
+            if ((os.path.exists(log_path + bucket_step_string + '/ckpts/' + source_type + '-' + target_type + '/net_epoch=2.tar'))\
+                & (os.path.exists(log_path + bucket_step_string + '/ckpts/' + source_type + '-' + target_type + '/per_image_stat.pkl'))):
+                continue
+            else:
+                print('--- Starting: %s-%s' % (source_type, target_type))
+
+                dispatch_job(command, params, gres = gres, output=output, run_name = source_type+'-'+target_type+'-'+bucket_step_string)
+                time.sleep(50)

@@ -74,8 +74,8 @@ if __name__ == '__main__':
 
     command = "ulimit -u 10000\n/home/shikhar.srivastava/miniconda3/envs/hovernet_11/bin/python /l/users/shikhar.srivastava/workspace/hover_net/run_transfer.py"
     params = dict()
-    params['gpu'] = '0,1'
-    gres = 'gpu:2'
+    params['gpu'] = '0,1,2,3'
+    gres = 'gpu:4'
     params['bucket_step_string'] = bucket_step_string
 
     selected_types = pd.read_csv(DIR + 'selected_types.csv')['0']
@@ -88,10 +88,18 @@ if __name__ == '__main__':
     for target_type in selected_types:
         params['target_organ'] = target_type
         for source_type in selected_types:
+            #if (source_type == 'Kidney' and target_type == 'Adrenal_gland') | (source_type == 'Breast' and target_type == 'Pancreatic'):
+        
             params['source_organ'] = source_type
             output = f'{log_path}{bucket_step_string}/slurm/{source_type}-{target_type}-%j.out'
             
             if not os.path.exists(log_path + bucket_step_string + '/ckpts/' + source_type + '-' + target_type + '/'):
                 os.makedirs(log_path + bucket_step_string + '/ckpts/' + source_type + '-' + target_type + '/')
             
-            dispatch_job(command, params, gres = gres, output=output, run_name = source_type+'-'+target_type+'-'+bucket_step_string)
+            if ((os.path.exists(log_path + bucket_step_string + '/ckpts/' + source_type + '-' + target_type + '/net_epoch=50.tar'))\
+                & (os.path.exists(log_path + bucket_step_string + '/ckpts/' + source_type + '-' + target_type + '/stats.json'))):
+                continue
+            else:
+                print(f'{source_type}-{target_type}-{bucket_step_string}')
+                dispatch_job(command, params, gres = gres, output=output, run_name = source_type+'-'+target_type+'-'+bucket_step_string)
+            
