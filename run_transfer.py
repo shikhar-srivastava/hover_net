@@ -3,7 +3,7 @@
 Main HoVer-Net training script.
 
 Usage:
-  run_train.py [--gpu=<id>] [--view=<dset>] [--source_organ=<string>] [--target_organ=<string>] [--bucket_step_string=<string>]
+  run_train.py [--gpu=<id>] [--view=<dset>] [--source_organ=<string>] [--target_organ=<string>] [--bucket_step_string=<string>] [--run_no=<string>]
   run_train.py (-h | --help)
   run_train.py --version
 
@@ -15,6 +15,7 @@ Options:
   --source_organ=<string> Source Organ to train on. Choose 'lung' or 'heart' or one of the other buckets.
   --target_organ=<string> Target Organ to train on. Choose 'lung' or 'heart' or one of the other buckets.
   --bucket_step_string=<string> Bucket step string.
+    --run_no=<string> Run number.
 """
 
 import cv2
@@ -69,8 +70,8 @@ def worker_init_fn(worker_id):
 class TrainManager(Config):
     """Either used to view the dataset or to initialise the main training loop."""
 
-    def __init__(self, source_organ, target_organ, bucket_step = 'top9'):
-        super().__init__(source_organ, target_organ, bucket_step)
+    def __init__(self, source_organ, target_organ, bucket_step = 'top9', run_no = 'first_run'):
+        super().__init__(source_organ, target_organ, bucket_step, run_no)
         return
 
     ####
@@ -300,10 +301,10 @@ if __name__ == "__main__":
     print('args received: %s' % args)
     os.environ["CUDA_VISIBLE_DEVICES"] = args["--gpu"]
 
-    trainer = TrainManager(source_organ = args['--source_organ'], target_organ=args['--target_organ'], bucket_step = args['--bucket_step_string'])
+    trainer = TrainManager(source_organ = args['--source_organ'], target_organ=args['--target_organ'], bucket_step = args['--bucket_step_string'], run_no = args['--run_no'])
     trainer.run()
     # Delete all .tar checkpoints except the last one
-    os.system("find /l/users/shikhar.srivastava/workspace/hover_net/logs/second_order/%s/ckpts/\
+    os.system("find /l/users/shikhar.srivastava/workspace/hover_net/logs/%s/second_order/%s/ckpts/\
         %s-%s/ -type f -name '*.tar' ! -name '*=%d.tar' -exec rm -r {} +" % \
-    (args['--bucket_step_string'],args['--source_organ'],args['--target_organ'],trainer.model_config['phase_list'][0]['nr_epochs']))
+    (args['--run_no'],args['--bucket_step_string'],args['--source_organ'],args['--target_organ'],trainer.model_config['phase_list'][0]['nr_epochs']))
  

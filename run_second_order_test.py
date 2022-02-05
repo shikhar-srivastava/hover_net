@@ -67,10 +67,11 @@ if __name__ == '__main__':
     '''
     # Define your command here
 
-    bucket_step_string = 'top19'
+    bucket_step_string = 'top5'
+    run_no = 'third_run'
 
     input_dir = '/l/users/shikhar.srivastava/data/pannuke/'
-    log_path = '/l/users/shikhar.srivastava/workspace/hover_net/logs/test/second_order/'
+    log_path = f'/l/users/shikhar.srivastava/workspace/hover_net/logs/{run_no}/test/second_order/'
     DIR = input_dir + bucket_step_string + '/'
 
     command = "ulimit -u 10000\n/home/shikhar.srivastava/miniconda3/envs/hovernet_11/bin/python /l/users/shikhar.srivastava/workspace/hover_net/run_test.py"
@@ -78,6 +79,7 @@ if __name__ == '__main__':
     params['gpu'] = '0,1,2,3'
     gres = 'gpu:4'
     params['bucket_step_string'] = bucket_step_string
+    params['run_no'] = run_no
 
     selected_types = pd.read_csv(DIR + 'selected_types.csv')['0']
 
@@ -85,7 +87,6 @@ if __name__ == '__main__':
         os.makedirs(log_path + bucket_step_string + '/')
         os.makedirs(log_path + bucket_step_string + '/ckpts/')
         os.makedirs(log_path + bucket_step_string + '/slurm/')
-
 
     for target_type in selected_types:
         params['target_organ'] = target_type
@@ -103,4 +104,4 @@ if __name__ == '__main__':
                 print('--- Starting: %s-%s' % (source_type, target_type))
 
                 dispatch_job(command, params, gres = gres, output=output, run_name = source_type+'-'+target_type+'-'+bucket_step_string)
-                time.sleep(50)
+                #time.sleep(50)

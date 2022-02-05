@@ -10,13 +10,14 @@ from dataset import get_dataset
 class Config(object):
     """Configuration file."""
 
-    def __init__(self, source_organ, target_organ, bucket_step):
+    def __init__(self, source_organ, target_organ, bucket_step, run_no):
         self.seed = 10
 
         # Adrenal_gland  Bile-duct  Breast  Cervix  Colon  Esophagus  HeadNeck  Liver  Thyroid
         self.source_organ = source_organ 
         self.target_organ = target_organ
         self.bucket_step = bucket_step
+        self.run_no = run_no
         self.logging = True
 
         # turn on debug flag to trace some parallel processing problems more easily
@@ -49,7 +50,7 @@ class Config(object):
                 raise Exception("If using `original` mode, input shape must be [256,256] and output shape must be [164,164]")
 
         self.dataset_name = "pannuke" # extracts dataset info from dataset.py
-        self.log_dir = "/l/users/shikhar.srivastava/workspace/hover_net/logs/second_order/%s/ckpts/%s-%s/" % (self.bucket_step, self.source_organ, self.target_organ) # where checkpoints will be saved
+        self.log_dir = "/l/users/shikhar.srivastava/workspace/hover_net/logs/%s/second_order/%s/ckpts/%s-%s/" % (self.run_no, self.bucket_step, self.source_organ, self.target_organ) # where checkpoints will be saved
 
         # For Transfer, training and validation lists are both the validation sets for the target organ
 
@@ -72,5 +73,5 @@ class Config(object):
             "models.%s.opt_second_order" % model_name
         )
 
-        pretrained_path = f'/l/users/shikhar.srivastava/workspace/hover_net/logs/first_order/{self.bucket_step}/ckpts/{self.source_organ}/01/net_epoch=50.tar'
+        pretrained_path = f'/l/users/shikhar.srivastava/workspace/hover_net/logs/{self.run_no}/first_order/{self.bucket_step}/ckpts/{self.source_organ}/01/net_epoch=50.tar'
         self.model_config = module.get_config(nr_type, model_mode, pretrained_path)

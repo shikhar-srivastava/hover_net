@@ -3,6 +3,8 @@ from re import X
 from simple_slurm import Slurm
 import os 
 import pandas as pd
+import time
+
 '''
     Install Slurm library:
         pip install simple-slurm
@@ -66,25 +68,30 @@ if __name__ == '__main__':
     '''
     # Define your command here
 
-    bucket_step_string = 'top19'
-
+    bucket_step_string = 'top5'
+    run_no = 'wo_imagenet'
     input_dir = '/l/users/shikhar.srivastava/data/pannuke/'
-    log_path = '/l/users/shikhar.srivastava/workspace/hover_net/logs/second_order/'
+    log_path = f'/l/users/shikhar.srivastava/workspace/hover_net/logs/{run_no}/second_order/'
     DIR = input_dir + bucket_step_string + '/'
 
     command = "ulimit -u 10000\n/home/shikhar.srivastava/miniconda3/envs/hovernet_11/bin/python /l/users/shikhar.srivastava/workspace/hover_net/run_transfer.py"
     params = dict()
     params['gpu'] = '0,1,2,3'
+    params['run_no'] = run_no
     gres = 'gpu:4'
     params['bucket_step_string'] = bucket_step_string
 
     selected_types = pd.read_csv(DIR + 'selected_types.csv')['0']
+
+    
 
     if not os.path.exists(log_path + bucket_step_string):
         os.makedirs(log_path + bucket_step_string + '/')
         os.makedirs(log_path + bucket_step_string + '/ckpts/')
         os.makedirs(log_path + bucket_step_string + '/slurm/')
 
+    jobs_at_a_time = 3
+    current_active_jobs = 0
     for target_type in selected_types:
         params['target_organ'] = target_type
         for source_type in selected_types:
@@ -102,4 +109,13 @@ if __name__ == '__main__':
             else:
                 print(f'{source_type}-{target_type}-{bucket_step_string}')
                 dispatch_job(command, params, gres = gres, output=output, run_name = source_type+'-'+target_type+'-'+bucket_step_string)
+                current_active_jobs+=1
+                if current_active_jobs >= jobs_at_a_time:
+                    current_active_jobs = 0
+                    print('Waiting for jobs to finish...')
+                    time.sleep(60*23.5)
+                    # Sleep for 23 minutes
+                    print('Jobs finished, continuing...')
+
+
             

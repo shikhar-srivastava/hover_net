@@ -3,7 +3,7 @@
 Main HoVer-Net training script.
 
 Usage:
-  run_train.py [--gpu=<id>] [--view=<dset>] [--organ=<string>] [--bucket_step_string=<string>]
+  run_train.py [--gpu=<id>] [--view=<dset>] [--organ=<string>] [--bucket_step_string=<string>] [--run_no=<string>]
   run_train.py (-h | --help)
   run_train.py --version
 
@@ -14,6 +14,7 @@ Options:
   --view=<dset>   Visualise images after augmentation. Choose 'train' or 'valid'.
   --organ=<string> Organ to train on. Choose 'lung' or 'heart' or one of the other buckets.
   --bucket_step_string=<string> Bucket step string.
+  --run_no=<string> Run number.
 """
 
 import cv2
@@ -68,8 +69,8 @@ def worker_init_fn(worker_id):
 class TrainManager(Config):
     """Either used to view the dataset or to initialise the main training loop."""
 
-    def __init__(self, organ = 'Breast', bucket_step = 'top9'):
-        super().__init__(organ, bucket_step)
+    def __init__(self, organ = 'Breast', bucket_step = 'top9', run_no = 'first_run'):
+        super().__init__(organ, bucket_step, run_no)
         return
 
     ####
@@ -299,10 +300,10 @@ if __name__ == "__main__":
     print('args received: %s' % args)
     os.environ["CUDA_VISIBLE_DEVICES"] = args["--gpu"]
 
-    trainer = TrainManager(organ = args['--organ'], bucket_step = args['--bucket_step_string'])
+    trainer = TrainManager(organ = args['--organ'], bucket_step = args['--bucket_step_string'], run_no = args['--run_no'])
     trainer.run()
 
     # Delete all .tar checkpoints except the last one
-    os.system("find /l/users/shikhar.srivastava/workspace/hover_net/logs/first_order/%s/ckpts/\
+    os.system("find /l/users/shikhar.srivastava/workspace/hover_net/logs/%s/first_order/%s/ckpts/\
         %s/ -type f -name '*.tar' ! -name '*=%d.tar' -exec rm -r {} +" % \
-    (args['--bucket_step_string'],args['--organ'],trainer.model_config['phase_list'][0]['nr_epochs']))
+    (args['--run_no'],args['--bucket_step_string'],args['--organ'],trainer.model_config['phase_list'][0]['nr_epochs']))

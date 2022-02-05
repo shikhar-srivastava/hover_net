@@ -23,7 +23,7 @@ NR_PROCS = int(16)
 BATCH_SIZE = int(32)
 # TODO: training config only ?
 # TODO: switch all to function name String for all option
-def get_config(nr_type, mode):
+def get_config(nr_type, mode, run_no):
     return {
         # ------------------------------------------------------------------
         # ! All phases have the same number of run engine
@@ -55,7 +55,7 @@ def get_config(nr_type, mode):
                         },
                         # path to load, -1 to auto load checkpoint from previous phase,
                         # None to start from scratch
-                        "pretrained": "/l/users/shikhar.srivastava/workspace/hover_net/ImageNet-ResNet50-Preact_pytorch.tar",
+                        "pretrained": None if run_no =="wo_imagenet" else "/l/users/shikhar.srivastava/workspace/hover_net/ImageNet-ResNet50-Preact_pytorch.tar",
                         # 'pretrained': None,
                     },
                 },

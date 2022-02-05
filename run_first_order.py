@@ -66,25 +66,26 @@ if __name__ == '__main__':
     '''
     # Define your command here
 
-    bucket_step_string = 'top19'
-
+    bucket_step_string = 'top5'
+    run_no = 'wo_imagenet'
     input_dir = '/l/users/shikhar.srivastava/data/pannuke/'
     DIR = input_dir + bucket_step_string + '/'
     command = "ulimit -u 10000\n/home/shikhar.srivastava/miniconda3/envs/hovernet_11/bin/python /l/users/shikhar.srivastava/workspace/hover_net/run_train.py"
     params = dict()
     params['gpu'] = '0,1,2,3'
     params['bucket_step_string'] = bucket_step_string
-    output = f'/l/users/shikhar.srivastava/workspace/hover_net/logs/first_order/{bucket_step_string}/slurm/%j.out'
+    params['run_no'] = run_no
+    output = f'/l/users/shikhar.srivastava/workspace/hover_net/logs/{run_no}/first_order/{bucket_step_string}/slurm/%j.out'
 
     selected_types = pd.read_csv(DIR + 'selected_types.csv')['0']
 
-    if not os.path.exists(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/first_order/{bucket_step_string}/'):
-        os.makedirs(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/first_order/{bucket_step_string}/')
-        os.makedirs(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/first_order/{bucket_step_string}/ckpts/')
-        os.makedirs(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/first_order/{bucket_step_string}/slurm/')
+    if not os.path.exists(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/{run_no}/first_order/{bucket_step_string}/'):
+        os.makedirs(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/{run_no}/first_order/{bucket_step_string}/')
+        os.makedirs(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/{run_no}/first_order/{bucket_step_string}/ckpts/')
+        os.makedirs(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/{run_no}/first_order/{bucket_step_string}/slurm/')
 
     for type in selected_types:
         params['organ'] = type
-        if not os.path.exists(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/first_order/{bucket_step_string}/ckpts/{type}/'):
-            os.makedirs(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/first_order/{bucket_step_string}/ckpts/{type}/')
+        if not os.path.exists(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/{run_no}/first_order/{bucket_step_string}/ckpts/{type}/'):
+            os.makedirs(f'/l/users/shikhar.srivastava/workspace/hover_net/logs/{run_no}/first_order/{bucket_step_string}/ckpts/{type}/')
         dispatch_job(command, params, output=output, run_name = type+'_'+bucket_step_string)
